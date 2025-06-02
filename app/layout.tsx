@@ -5,7 +5,7 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 import { PWAStatus } from "@/components/pwa-status"
-import { registerServiceWorker } from "@/lib/pwa-utils"
+import { ClientPWASetup } from "@/components/client-pwa-setup"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
@@ -47,11 +47,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Register service worker on client side
-  if (typeof window !== "undefined") {
-    registerServiceWorker()
-  }
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -95,6 +90,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {/* Client-side PWA setup */}
+          <ClientPWASetup />
+
           {/* PWA Status in top corner */}
           <div className="fixed top-2 right-2 z-50">
             <PWAStatus />

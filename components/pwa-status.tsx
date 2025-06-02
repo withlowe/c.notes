@@ -8,8 +8,15 @@ export function PWAStatus() {
   const [isOnline, setIsOnline] = useState(true)
   const [isInstalled, setIsInstalled] = useState(false)
   const [updateAvailable, setUpdateAvailable] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    // Mark as client-side rendered
+    setIsClient(true)
+
+    // Only run on client side
+    if (typeof window === "undefined") return
+
     // Check online status
     setIsOnline(navigator.onLine)
 
@@ -42,7 +49,14 @@ export function PWAStatus() {
   }, [])
 
   const handleUpdate = () => {
-    window.location.reload()
+    if (typeof window !== "undefined") {
+      window.location.reload()
+    }
+  }
+
+  // Don't render anything during SSR
+  if (!isClient) {
+    return null
   }
 
   return (

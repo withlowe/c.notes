@@ -17,9 +17,17 @@ export function PWAInstallPrompt() {
   const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return
+
     // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsInstalled(true)
+      return
+    }
+
+    // Check if already dismissed this session
+    if (sessionStorage.getItem("pwa-prompt-dismissed")) {
       return
     }
 
@@ -76,12 +84,16 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false)
-    // Don't show again for this session
-    sessionStorage.setItem("pwa-prompt-dismissed", "true")
+    // Don't show again for this session - only access sessionStorage on client
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("pwa-prompt-dismissed", "true")
+    }
   }
 
   // Don't show if already installed or dismissed this session
-  if (isInstalled || sessionStorage.getItem("pwa-prompt-dismissed")) {
+  // Check sessionStorage safely
+  const isDismissed = typeof window !== "undefined" ? sessionStorage.getItem("pwa-prompt-dismissed") : false
+  if (isInstalled || isDismissed) {
     return null
   }
 
